@@ -40,3 +40,9 @@ exports.handler = async (event) => {
       const sorted = items.filter(Boolean).sort((a, b) => new Date(a.ts) - new Date(b.ts));
       return { statusCode: 200, headers, body: JSON.stringify(sorted) };
     } catch (e) {
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "Error al leer datos" }) };
+    }
+  }
+
+  return { statusCode: 405, headers, body: JSON.stringify({ error: "Método no permitido" }) };
+};
