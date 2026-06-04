@@ -46,5 +46,26 @@ exports.handler = async (event) => {
     }
   }
 
+  // DELETE — borrar una respuesta (con ?id=xxx) o todas (sin id)
+  if (event.httpMethod === "DELETE") {
+    const key = event.headers["x-admin-key"] || event.queryStringParameters?.key;
+    if (key !== ADMIN_KEY) {
+      return { statusCode: 401, headers, body: JSON.stringify({ error: "No autorizado" }) };
+    }
+    try {
+      const id = event.queryStringParameters?.id;
+      if (id) {
+        await store.delete(id);
+        return { statusCode: 200, headers, body: JSON.stringify({ ok: true, deleted: id }) };
+      } else {
+        const { blobs } = await store.list();
+        await Promise.all(blobs.map((b) => store.delete(b.key)));
+        return { statusCode: 200, headers, body: JSON.stringify({ ok: true, deleted: blobs.length }) };
+      }
+    } catch (e) {
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "Error al borrar" }) };
+    }
+  }
+
   return { statusCode: 405, headers, body: JSON.stringify({ error: "Método no permitido" }) };
 };
