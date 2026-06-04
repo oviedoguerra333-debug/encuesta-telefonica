@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Encuesta — Atención al cliente telefónica</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Serif+Display&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #1a1a18;
+      --ink-2: #5f5e5a;
+      --ink-3: #888780;
+      --bg: #f5f5f3;
+      --card: #ffffff;
+      --border: #d3d1c7;
+      --border-light: #e8e6de;
+      --accent: #534AB7;
+      --accent-dark: #3C3489;
+      --accent-bg: #EEEDFE;
+      --success: #2D7A4F;
+      --error: #A32D2D;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      padding: 2.5rem 1rem 4rem;
+    }
+
+    .wrap {
+      max-width: 660px;
+      margin: 0 auto;
+    }
+
+    /* Header */
+    .header {
+      margin-bottom: 2rem;
+    }
+    .header-eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 6px;
+    }
+    .header h1 {
+      font-family: 'DM Serif Display', serif;
+      font-size: 28px;
+      font-weight: 400;
+      color: var(--ink);
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+    .header p {
+      font-size: 14px;
+      color: var(--ink-2);
+    }
+
+    /* Card */
+    .card {
+      background: var(--card);
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      padding: 2rem 1.75rem;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    }
+
+    /* Progress */
+    .progress-bar {
+      height: 3px;
+      background: var(--border-light);
+      border-radius: 99px;
+      margin-bottom: 1.75rem;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: var(--accent);
+      border-radius: 99px;
+      transition: width 0.4s ease;
+      width: 0%;
+    }
+
+    /* Sections */
+    .section { margin-bottom: 1.75rem; }
+    .q-num {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      color: var(--ink-3);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .q-label {
+      font-size: 15px;
+      font-weight: 500;
+      color: var(--ink);
+      margin-bottom: 4px;
+      line-height: 1.4;
+    }
+    .q-hint { font-size: 12px; color: var(--ink-3); margin-bottom: 10px; }
+
+    .divider { height: 1px; background: var(--border-light); margin: 1.5rem 0; }
+
+    /* Radio */
+    .radio-group { display: flex; flex-direction: column; gap: 6px; }
+    .radio-item {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 14px; color: var(--ink);
+      cursor: pointer;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .radio-item:hover { background: var(--accent-bg); border-color: var(--accent); }
+    .radio-item input[type="radio"] { accent-color: var(--accent); width: 15px; height: 15px; flex-shrink: 0; }
+    .radio-item.selected { background: var(--accent-bg); border-color: var(--accent); }
+
+    /* Checkboxes */
+    .checkbox-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .cb-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 13px; color: var(--ink);
+      cursor: pointer;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid transparent;
+      transition: background 0.12s, border-color 0.12s;
+    }
+    .cb-item:hover { background: var(--accent-bg); border-color: var(--accent); }
+    .cb-item input { accent-color: var(--accent); width: 14px; height: 14px; flex-shrink: 0; margin-top: 1px; }
+
+    /* Scale */
+    .scale-row { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 6px; }
+    .scale-btn {
+      width: 38px; height: 38px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--ink-2);
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.12s, color 0.12s, border-color 0.12s, transform 0.1s;
+    }
+    .scale-btn:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+    .scale-btn.sel { background: var(--accent); color: #fff; border-color: var(--accent); transform: translateY(-1px); }
+    .scale-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--ink-3); }
+
+    /* Textarea */
+    textarea {
+      width: 100%; min-height: 70px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-family: 'DM Sans', sans-serif;
+      color: var(--ink);
+      background: var(--card);
+      resize: vertical;
+      transition: border-color 0.12s;
+    }
+    textarea:focus { outline: none; border-color: var(--accent); }
+
+    /* Buttons */
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 32px;
+      font-size: 14px;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: background 0.15s, transform 0.1s;
+    }
+    .btn-primary:hover { background: var(--accent-dark); transform: translateY(-1px); }
+    .btn-primary:active { transform: translateY(0); }
+    .btn-primary:disabled { background: var(--border); cursor: not-allowed; transform: none; }
+
+    /* Messages */
+    .action-row { display: flex; gap: 14px; align-items: center; flex-wrap: wrap; margin-top: 0.25rem; }
+    .msg {
+      font-size: 13px;
+      padding: 8px 14px;
+      border-radius: 8px;
+      display: none;
+    }
+    .msg-ok { background: #e6f4ec; color: var(--success); }
+    .msg-err { background: #fdeaea; color: var(--error); }
+
+    /* Footer */
+    .footer-link {
+      text-align: center;
+      margin-top: 1.5rem;
+      font-size: 13px;
+      color: var(--ink-3);
+    }
+    .footer-link a { color: var(--accent); text-decoration: none; font-weight: 500; }
+    .footer-link a:hover { text-decoration: underline; }
+
+    /* Loading spinner */
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="header">
+    <div class="header-eyebrow">Encuesta de satisfacción</div>
+    <h1>Atención al cliente — empresa telefónica</h1>
+    <p>Queremos conocer tu experiencia. Todas las respuestas son anónimas.</p>
+  </div>
+
+  <div class="card">
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+    <!-- P1 -->
+    <div class="section">
+      <div class="q-num">Pregunta 1 de 6</div>
+      <div class="q-label">¿Cuál ha sido el principal problema al contactar el servicio al cliente?</div>
+      <div class="q-hint">Selecciona el que más te ha afectado.</div>
+      <div class="radio-group" id="rg-q1">
+        <label class="radio-item"><input type="radio" name="q1" value="Tiempos de espera muy largos"> Tiempos de espera muy largos</label>
+        <label class="radio-item"><input type="radio" name="q1" value="El asesor no resolvió mi problema"> El asesor no resolvió mi problema</label>
+        <label class="radio-item"><input type="radio" name="q1" value="Me dieron información incorrecta"> Me dieron información incorrecta</label>
+        <label class="radio-item"><input type="radio" name="q1" value="Tuve que llamar varias veces por lo mismo"> Tuve que llamar varias veces por lo mismo</label>
+        <label class="radio-item"><input type="radio" name="q1" value="El trato del asesor fue poco amable"> El trato del asesor fue poco amable</label>
+        <label class="radio-item"><input type="radio" name="q1" value="No encontré cómo comunicarme con alguien"> No encontré cómo comunicarme con alguien</label>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- P2 -->
+    <div class="section">
+      <div class="q-num">Pregunta 2 de 6</div>
+      <div class="q-label">¿Con qué frecuencia contactaste el servicio al cliente en el último mes?</div>
+      <div class="q-hint">1 = nunca · 10 = muchas veces</div>
+      <div class="scale-row" id="s2"></div>
+      <div class="scale-labels"><span>Nunca</span><span>Muchas veces</span></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- P3 -->
+    <div class="section">
+      <div class="q-num">Pregunta 3 de 6</div>
+      <div class="q-label">¿Cuánto tiempo esperaste en promedio para ser atendido?</div>
+      <div class="radio-group" id="rg-q3">
+        <label class="radio-item"><input type="radio" name="q3" value="1"> Menos de 5 minutos</label>
+        <label class="radio-item"><input type="radio" name="q3" value="2"> Entre 5 y 15 minutos</label>
+        <label class="radio-item"><input type="radio" name="q3" value="3"> Entre 15 y 30 minutos</label>
+        <label class="radio-item"><input type="radio" name="q3" value="4"> Más de 30 minutos</label>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- P4 -->
+    <div class="section">
+      <div class="q-num">Pregunta 4 de 6</div>
+      <div class="q-label">¿Qué tan satisfecho quedaste con la atención recibida?</div>
+      <div class="q-hint">1 = muy insatisfecho · 10 = muy satisfecho</div>
+      <div class="scale-row" id="s4"></div>
+      <div class="scale-labels"><span>Muy insatisfecho</span><span>Muy satisfecho</span></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- P5 -->
+    <div class="section">
+      <div class="q-num">Pregunta 5 de 6</div>
+      <div class="q-label">¿Qué aspectos crees que fallan más? (puedes marcar varios)</div>
+      <div class="checkbox-grid">
+        <label class="cb-item"><input type="checkbox" value="Poca disponibilidad de asesores"> Poca disponibilidad</label>
+        <label class="cb-item"><input type="checkbox" value="Asesores poco capacitados"> Asesores poco capacitados</label>
+        <label class="cb-item"><input type="checkbox" value="La app o página web no funciona bien"> App o web con fallas</label>
+        <label class="cb-item"><input type="checkbox" value="No hay canales alternativos de atención"> Pocos canales de atención</label>
+        <label class="cb-item"><input type="checkbox" value="Los procesos son complicados y lentos"> Procesos lentos y complicados</label>
+        <label class="cb-item"><input type="checkbox" value="No hacen seguimiento a los casos"> Sin seguimiento a casos</label>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- P6 -->
+    <div class="section">
+      <div class="q-num">Pregunta 6 de 6</div>
+      <div class="q-label">¿Qué mejorarías del servicio? <span style="font-weight:400;color:var(--ink-3)">(opcional)</span></div>
+      <textarea id="q6" placeholder="Cuéntanos tu sugerencia..."></textarea>
+    </div>
+
+    <div class="action-row">
+      <button class="btn-primary" id="btn-enviar" onclick="enviar()">Enviar respuesta</button>
+      <span class="msg msg-ok" id="msg-ok">✓ ¡Gracias por responder!</span>
+      <span class="msg msg-err" id="msg-err">Por favor completa las preguntas 1, 2, 3 y 4.</span>
+    </div>
+  </div>
+
+  <div class="footer-link">
+    ¿Eres el administrador? <a href="dashboard.html">Ver respuestas y diagramas →</a>
+  </div>
+</div>
+
+<script>
+  let s2val = null, s4val = null;
+
+  function buildScale(id, setter) {
+    const row = document.getElementById(id);
+    for (let i = 1; i <= 10; i++) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'scale-btn';
+      b.textContent = i;
+      b.onclick = () => {
+        row.querySelectorAll('.scale-btn').forEach(x => x.classList.remove('sel'));
+        b.classList.add('sel');
+        setter(i);
+        updateProgress();
+      };
+      row.appendChild(b);
+    }
+  }
+
+  buildScale('s2', v => s2val = v);
+  buildScale('s4', v => s4val = v);
+
+  // Highlight selected radio/checkbox rows
+  document.querySelectorAll('.radio-group').forEach(g => {
+    g.addEventListener('change', () => {
+      g.querySelectorAll('.radio-item').forEach(el => {
+        el.classList.toggle('selected', el.querySelector('input').checked);
+      });
+      updateProgress();
+    });
+  });
+
+  function countFilled() {
+    const q1 = document.querySelector('input[name="q1"]:checked');
+    const q3 = document.querySelector('input[name="q3"]:checked');
+    return [!!q1, s2val !== null, !!q3, s4val !== null].filter(Boolean).length;
+  }
+
+  function updateProgress() {
+    document.getElementById('progress').style.width = (countFilled() / 4 * 100) + '%';
+  }
+
+  async function enviar() {
+    document.getElementById('msg-ok').style.display = 'none';
+    document.getElementById('msg-err').style.display = 'none';
+
+    const q1 = document.querySelector('input[name="q1"]:checked');
+    const q3 = document.querySelector('input[name="q3"]:checked');
+
+    if (!q1 || s2val === null || !q3 || s4val === null) {
+      document.getElementById('msg-err').style.display = 'inline-block';
+      return;
+    }
+
+    const btn = document.getElementById('btn-enviar');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner"></span>Enviando...';
+
+    const cbs = [...document.querySelectorAll('.checkbox-grid input:checked')].map(c => c.value);
+    const payload = {
+      q1: q1.value,
+      q2: s2val,
+      q3: parseFloat(q3.value),
+      q4: s4val,
+      q5: cbs,
+      q6: document.getElementById('q6').value.trim()
+    };
+
+    try {
+      const res = await fetch('/.netlify/functions/survey', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      if (!res.ok) throw new Error('Error del servidor');
+
+      // Reset form
+      document.querySelectorAll('input[name="q1"], input[name="q3"]').forEach(i => i.checked = false);
+      document.querySelectorAll('.radio-item').forEach(el => el.classList.remove('selected'));
+      document.querySelectorAll('.checkbox-grid input').forEach(c => c.checked = false);
+      document.getElementById('q6').value = '';
+      document.querySelectorAll('.scale-btn').forEach(b => b.classList.remove('sel'));
+      s2val = null; s4val = null;
+      document.getElementById('progress').style.width = '0%';
+      document.getElementById('msg-ok').style.display = 'inline-block';
+    } catch (e) {
+      document.getElementById('msg-err').textContent = 'Error al enviar. Intenta de nuevo.';
+      document.getElementById('msg-err').style.display = 'inline-block';
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Enviar respuesta';
+  }
+</script>
+</body>
+</html>
