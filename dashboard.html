@@ -228,6 +228,19 @@
     .resp-row { margin-bottom: 5px; color: var(--ink-2); }
     .resp-row strong { color: var(--ink); font-weight: 500; }
     .resp-comment { margin-top: 8px; font-style: italic; color: var(--ink-2); border-left: 3px solid var(--accent); padding-left: 10px; }
+    .btn-delete-resp {
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      border: 1px solid #f0c0c0;
+      background: var(--danger-bg);
+      color: var(--danger);
+      transition: background 0.12s;
+    }
+    .btn-delete-resp:hover { background: #fbdada; }
 
     .empty-state {
       text-align: center;
@@ -652,10 +665,13 @@
     el.innerHTML = allData.map((r, i) => {
       const date = r.ts ? new Date(r.ts).toLocaleString('es-CO', {day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}) : '';
       return `
-      <div class="resp-card">
+      <div class="resp-card" id="card-${r.id}">
         <div class="resp-header">
           <span class="resp-num">Persona ${i+1}</span>
-          <span class="resp-ts">${date}</span>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="resp-ts">${date}</span>
+            <button class="btn-delete-resp" onclick="borrarRespuesta('${r.id}', ${i+1})">🗑 Borrar</button>
+          </div>
         </div>
         <div class="resp-row"><strong>Problema principal:</strong> ${r.q1}</div>
         <div class="resp-row"><strong>Frecuencia de contacto:</strong> ${r.q2}/10 &nbsp;·&nbsp; <strong>Espera:</strong> ${espera[r.q3]} &nbsp;·&nbsp; <strong>Satisfacción:</strong> ${r.q4}/10</div>
@@ -681,6 +697,19 @@
       allData = [];
       renderAll();
       showToast('Todas las respuestas fueron borradas');
+    } catch(e) {
+      showToast('Error de conexión');
+    }
+  }
+
+  async function borrarRespuesta(id, num) {
+    if (!confirm(`¿Borrar la respuesta de la Persona ${num}? Esta acción no se puede deshacer.`)) return;
+    try {
+      const res = await fetch(`/.netlify/functions/survey?key=${encodeURIComponent(adminKey)}&id=${encodeURIComponent(id)}`, { method: 'DELETE' });
+      if (!res.ok) { showToast('Error al borrar la respuesta'); return; }
+      allData = allData.filter(r => r.id !== id);
+      renderAll();
+      showToast('Respuesta borrada ✓');
     } catch(e) {
       showToast('Error de conexión');
     }

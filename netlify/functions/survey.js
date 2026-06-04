@@ -1,8 +1,10 @@
-const { getStore } = require("@netlify/blobs");
+const { getStore, connectLambda } = require("@netlify/blobs");
 
 const ADMIN_KEY = process.env.ADMIN_KEY || "cambiar-esta-clave-secreta";
 
 exports.handler = async (event) => {
+  connectLambda(event);
+
   const headers = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type, X-Admin-Key",
@@ -40,3 +42,30 @@ exports.handler = async (event) => {
       const sorted = items.filter(Boolean).sort((a, b) => new Date(a.ts) - new Date(b.ts));
       return { statusCode: 200, headers, body: JSON.stringify(sorted) };
     } catch (e) {
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "Error al leer datos" }) };
+    }
+  }
+
+  // DELETE — borrar una respuesta (con ?id=xxx) o todas (sin id)
+  if (event.httpMethod === "DELETE") {
+    const key = event.headers["x-admin-key"] || event.queryStringParameters?.key;
+    if (key !== ADMIN_KEY) {
+      return { statusCode: 401, headers, body: JSON.stringify({ error: "No autorizado" }) };
+    }
+    try {
+      const id = event.queryStringParameters?.id;
+      if (id) {
+        await store.delete(id);
+        return { statusCode: 200, headers, body: JSON.stringify({ ok: true, deleted: id }) };
+      } else {
+        const { blobs } = await store.list();
+        await Promise.all(blobs.map((b) => store.delete(b.key)));
+        return { statusCode: 200, headers, body: JSON.stringify({ ok: true, deleted: blobs.length }) };
+      }
+    } catch (e) {
+      return { statusCode: 500, headers, body: JSON.stringify({ error: "Error al borrar" }) };
+    }
+  }
+
+  return { statusCode: 405, headers, body: JSON.stringify({ error: "Método no permitido" }) };
+};
