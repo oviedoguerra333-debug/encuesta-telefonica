@@ -1,8 +1,10 @@
-const { getStore } = require("@netlify/blobs");
+const { getStore, connectLambda } = require("@netlify/blobs");
 
 const ADMIN_KEY = process.env.ADMIN_KEY || "cambiar-esta-clave-secreta";
 
 exports.handler = async (event) => {
+  connectLambda(event);
+
   const headers = {
     "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Headers": "Content-Type, X-Admin-Key",
